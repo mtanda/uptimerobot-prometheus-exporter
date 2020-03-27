@@ -33,7 +33,7 @@ BRANCH_FLAG := -X `go list ./version`.Branch=$(BRANCH)
 BUILD_DATE_FLAG := -X `go list ./version`.BuildTime=$(BUILD_DATE)
 LOGLEVEL_FLAG := -X `go list ./log`.level=$(LOGLEVEL)
 
-all: deps style format test build
+all: style format test build
 
 version.txt:
 	./gen_version.sh > version.txt
@@ -54,7 +54,7 @@ deps:
 	@hash $(DEP) 2>&1 /dev/null || (curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh)
 	@$(DEP) ensure
 
-$(PREFIX)/bin/$(PKG_NAME): version.txt deps $(shell find $(PREFIX) -type f -name '*.go')
+$(PREFIX)/bin/$(PKG_NAME): version.txt $(shell find $(PREFIX) -type f -name '*.go')
 	CGO_ENABLED=0 $(GO) build \
 			-ldflags "-w -s $(COMMIT_FLAG) $(VERSION_FLAG) $(BRANCH_FLAG) $(BUILD_DATE_FLAG) $(LOGLEVEL_FLAG)" \
 			-o $@
@@ -73,7 +73,7 @@ vet:
 
 build: $(PREFIX)/bin/$(PKG_NAME)
 
-docker: deps format $(PREFIX)/bin/$(PKG_NAME)
+docker: format $(PREFIX)/bin/$(PKG_NAME)
 	@echo ">> building docker image"
 	@docker build -t "$(DOCKER_IMAGE_NAME):$(VERSION)" \
 		--build-arg BUILD_DATE=$(BUILD_DATE) \

@@ -151,10 +151,10 @@ func getMonitors(client *api.Client, offset int) (*api.XMLMonitors, error) {
 		log.Errorln("Error getting monitorsRequest", err)
 		return nil, err
 	}
-	log.Infof("Response from UptimeRobot API", response)
+	log.Infof("Response from UptimeRobot API: %v", response)
 
 	if response == nil {
-		log.Errorln("No monitor response: %v", response)
+		log.Errorf("No monitor response: %v", response)
 		return nil, err
 	}
 
